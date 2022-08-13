@@ -1,4 +1,4 @@
-pragma solidity 0.4.20;
+pragma solidity >=0.4.17;
 contract Casino {
    address public owner;
    uint256 public minimumBet;
@@ -10,15 +10,22 @@ contract Casino {
       uint256 amountBet;
       uint256 numberSelected;
    }
-   // The address of the player and => the user info   
+
    mapping(address => Player) public playerInfo;
+
    function() public payable {}
-   function Casino(uint256 _minimumBet) public {
-      owner = msg.sender;
-      if(_minimumBet != 0 ) minimumBet = _minimumBet;
+   
+   function Casino(uint256 _minimumBet) public{
+   owner = msg.sender;
+   if(_minimumBet != 0 ) minimumBet = _minimumBet;
    }
    function kill() public {
       if(msg.sender == owner) selfdestruct(owner);
+   }
+   function resetData() private{
+   players.length = 0; // Delete all the players array
+   totalBet = 0;
+   numberOfBets = 0;
    }
    function checkPlayerExists(address player) public constant returns(bool){
       for(uint256 i = 0; i < players.length; i++){
@@ -26,10 +33,10 @@ contract Casino {
       }
       return false;
    }
-   // To bet for a number between 1 and 10 both inclusive
+    // To bet for a number between 1 and 10 both inclusive
    function bet(uint256 numberSelected) public payable {
       require(!checkPlayerExists(msg.sender));
-      require(numberSelected >= 1 && numberSelected <= 10);
+      require(numberSelected>=1 && numberSelected<=10);
       require(msg.value >= minimumBet);
       playerInfo[msg.sender].amountBet = msg.value;
       playerInfo[msg.sender].numberSelected = numberSelected;
@@ -37,12 +44,12 @@ contract Casino {
       players.push(msg.sender);
       totalBet += msg.value;
    }
-   // Generates a number between 1 and 10 that will be the winner
+      // Generates a number between 1 and 10 that will be the winner
    function generateNumberWinner() public {
       uint256 numberGenerated = block.number % 10 + 1; // This isn't secure
       distributePrizes(numberGenerated);
    }
-   // Sends the corresponding ether to each winner depending on the total bets
+    // Sends the corresponding ether to each winner depending on the total bets
    function distributePrizes(uint256 numberWinner) public {
       address[100] memory winners; // We have to create a temporary in memory array with fixed size
       uint256 count = 0; // This is the count for the array of winners
@@ -60,5 +67,6 @@ contract Casino {
          if(winners[j] != address(0)) // Check that the address in this fixed array is not empty
          winners[j].transfer(winnerEtherAmount);
       }
+      resetData();
    }
 }

@@ -6,8 +6,6 @@ ul{
     list-style-type: none;
     padding-left: 0;
     display: flex;
-    justify-content: space-around;
-    max-width: 1300px;
 }
 li{
     padding: 40px;
@@ -43,13 +41,4 @@ li:active{
    border: 1px solid lightgrey;
    font-size: 15pt;
    margin: 0 10px;
-}
-
-@media (max-width: 1100px){
-   ul{
-      flex-direction: column;
-   }
-   li{
-      margin: 5px 0;
-   }
 }
